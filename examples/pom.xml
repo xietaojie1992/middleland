@@ -42,6 +42,26 @@
             <groupId>com.middleland</groupId>
             <artifactId>common-rabbitmq</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.middleland</groupId>
+            <artifactId>common-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.middleland</groupId>
+            <artifactId>common-zookeeper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.middleland</groupId>
+            <artifactId>common-influxdb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.middleland</groupId>
+            <artifactId>common-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.middleland</groupId>
+            <artifactId>lock-zookeeper</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

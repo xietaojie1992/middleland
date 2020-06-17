@@ -22,6 +22,7 @@
         <module>artifacts</module>
         <module>commons</module>
         <module>examples</module>
+        <module>locks</module>
     </modules>
 
     <build>

@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Zenlayer.com Inc.
+  ~ Copyright (c) 2014-2020 All Rights Reserved.
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>commons</artifactId>
+        <artifactId>locks</artifactId>
         <groupId>com.middleland</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>locks</artifactId>
+    <artifactId>lock-local</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.middleland</groupId>
+            <artifactId>lock-base</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

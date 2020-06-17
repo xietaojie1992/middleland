@@ -19,7 +19,6 @@
         <module>common-redis</module>
         <module>common-influxdb</module>
         <module>common-elasticsearch</module>
-        <module>locks</module>
     </modules>
 
     <properties>
@@ -66,11 +65,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>common-zookeeper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>locks</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
