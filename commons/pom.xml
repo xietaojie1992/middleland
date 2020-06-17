@@ -32,6 +32,7 @@
         <curator.version>4.2.0-osgi</curator.version>
         <zookeeper.version>3.5.5</zookeeper.version>
         <rabbitmq.version>5.4.3</rabbitmq.version>
+        <jedis.version>3.3.0</jedis.version>
         <jackson.version>2.9.10.4</jackson.version>
     </properties>
 
@@ -119,6 +120,12 @@
                 <artifactId>amqp-client</artifactId>
                 <version>${rabbitmq.version}</version>
             </dependency>
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
