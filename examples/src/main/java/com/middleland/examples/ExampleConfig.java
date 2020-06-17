@@ -1,5 +1,8 @@
 package com.middleland.examples;
 
+import com.middleland.commons.curator.CuratorConfig;
+import com.middleland.commons.curator.CuratorInstance;
+import com.middleland.commons.curator.CuratorInstanceImpl;
 import com.middleland.commons.rabbit.RabbitConfig;
 import com.middleland.commons.rabbit.RabbitFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -25,15 +28,15 @@ public class ExampleConfig {
         return new RabbitFactory(rabbitConfig);
     }
 
-    //@Bean
-    //@ConfigurationProperties(prefix = "curator")
-    //public CuratorConfig curatorConfig() {
-    //    return new CuratorConfig();
-    //}
-    //
-    //@Bean
-    //@ConditionalOnBean(name = "curatorConfig")
-    //public CuratorInstance curatorInstance(CuratorConfig curatorConfig) throws Exception {
-    //    return new CuratorInstanceImpl(curatorConfig);
-    //}
+    @Bean
+    @ConfigurationProperties(prefix = "curator")
+    public CuratorConfig curatorConfig() {
+        return new CuratorConfig();
+    }
+
+    @Bean
+    @ConditionalOnBean(name = "curatorConfig")
+    public CuratorInstance curatorInstance(CuratorConfig curatorConfig) throws Exception {
+        return new CuratorInstanceImpl(curatorConfig);
+    }
 }
