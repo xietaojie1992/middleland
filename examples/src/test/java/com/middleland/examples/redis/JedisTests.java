@@ -1,12 +1,18 @@
 package com.middleland.examples.redis;
 
+import com.middleland.commons.redis.JedisInstance;
 import com.middleland.examples.ExamplesApplicationTests;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Transaction;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -15,7 +21,11 @@ import java.util.Set;
 @Slf4j
 public class JedisTests extends ExamplesApplicationTests {
 
-    private Jedis jedis = new Jedis("localhost", 6379);
+    @Autowired
+    private JedisInstance jedisInstance;
+
+    @Autowired
+    private Jedis jedis;
 
     @Test
     public void stringTest() {
@@ -159,4 +169,104 @@ public class JedisTests extends ExamplesApplicationTests {
     public void hyperloglogTest() {
     }
 
+    @Test
+    public void transactionalTest() {
+        // 事务机制
+        Transaction transaction = jedis.multi();// 开启事务
+        transaction.lpush("key", "11");
+        transaction.lpush("key", "22");
+        transaction.lpush("key", "33");
+
+        // 收到 EXEC 命令后进入事务执行，但需要注意的是：不同于原子性，事务中任意命令执行失败，其余的命令依然被执行，即允许部分成功
+        // 在事务执行过程，其他客户端提交的命令请求不会插入到事务执行命令序列中
+        List<Object> list = transaction.exec();// 提交事务
+
+        list.stream().map(Objects::toString).forEach(log::info);
+        Assert.assertEquals(3, jedis.lrange("key", 0, -1).size());
+
+        try {
+            transaction = jedis.multi();
+            transaction.lpush("key", "44");
+            transaction.lpush("key", "55");
+            transaction.lpush("key", "66");
+            int error = 6 / 0;
+            transaction.exec();
+        } catch (Exception e) {
+            log.error("Error, transaction should be failed");
+        }
+        jedis.resetState();
+        Assert.assertEquals(3, jedis.lrange("key", 0, -1).size());
+        jedis.del("key");
+    }
+
+    @Test
+    public void optimisticLock() {
+        jedis.set("version", "0");
+        try {
+            jedis.watch("version");
+            Integer oldVersion = Integer.valueOf(jedis.get("version"));
+            Transaction transaction = jedis.multi();
+            transaction.set("version", String.valueOf(oldVersion + 1));
+            List<Object> result = transaction.exec();
+            if (result == null || result.isEmpty()) {
+                log.info("获取 Redis 乐观锁失败");
+            } else {
+                log.info("获取 Redis 乐观锁成功，进行下一步操作");
+                jedis.set("key", String.valueOf(oldVersion + 1));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            jedis.resetState();
+            jedis.unwatch();
+        }
+    }
+
+    @Test
+    public void pipelineTest() {
+        Pipeline pipeline = jedis.pipelined();
+        try {
+            pipeline.lpush("list", "1");
+            pipeline.lpush("list", "2");
+            pipeline.lpush("list", "3");
+            pipeline.sync();
+            Assert.assertEquals(3, jedis.lrange("list", 0, -1).size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            jedis.del("list");
+        }
+    }
+
+    @Test
+    public void mqTest() throws InterruptedException {
+        String channelName = "channel:1";
+
+        JedisPubSub jedisPubSub = new JedisPubSub() {
+            @Override
+            public void onMessage(String channel, String message) {
+                log.info("onMessage, channel={}, message={}", channel, message);
+            }
+
+            @Override
+            public void onSubscribe(String channel, int subscribedChannels) {
+                log.info("onSubscribe, channel={}, subscribedChannels={}", channel, subscribedChannels);
+            }
+
+            @Override
+            public void onUnsubscribe(String channel, int subscribedChannels) {
+                log.info("onUnsubscribe, channel={}, subscribedChannels={}", channel, subscribedChannels);
+            }
+        };
+
+        // subscribe 是阻塞方法，所以新起一个线程
+        new Thread(() -> jedis.subscribe(jedisPubSub, channelName)).start();
+        Thread.sleep(1000);
+
+        Jedis pubJedis = jedisInstance.getInstance();
+        pubJedis.publish(channelName, "test message:1");
+        pubJedis.publish(channelName, "test message:2");
+        pubJedis.publish(channelName, "test message:3");
+        Thread.sleep(1000);
+    }
 }
