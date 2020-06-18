@@ -5,11 +5,14 @@ import com.middleland.commons.curator.CuratorInstance;
 import com.middleland.commons.curator.CuratorInstanceImpl;
 import com.middleland.commons.rabbit.RabbitConfig;
 import com.middleland.commons.rabbit.RabbitFactory;
+import com.middleland.commons.redis.JedisInstance;
+import com.middleland.commons.redis.RedisConfig;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.Jedis;
 
 /**
  * @author xietaojie
@@ -45,5 +48,23 @@ public class ExampleConfig {
     @ConditionalOnBean(name = "curatorInstance")
     public CuratorFramework curatorFramework(CuratorInstance curatorInstance) {
         return curatorInstance.getCurator();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "redis")
+    public RedisConfig redisConfig() {
+        return new RedisConfig();
+    }
+
+    @Bean
+    @ConditionalOnBean(name = "redisConfig")
+    public JedisInstance jedisInstance(RedisConfig redisConfig) {
+        return new JedisInstance(redisConfig);
+    }
+
+    @Bean
+    @ConditionalOnBean(name = "jedisInstance")
+    public Jedis jedis(JedisInstance jedisInstance) {
+        return jedisInstance.getInstance();
     }
 }
