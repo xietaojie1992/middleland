@@ -5,6 +5,7 @@ import com.middleland.commons.curator.CuratorInstance;
 import com.middleland.commons.curator.CuratorInstanceImpl;
 import com.middleland.commons.rabbit.RabbitConfig;
 import com.middleland.commons.rabbit.RabbitFactory;
+import org.apache.curator.framework.CuratorFramework;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,5 +39,11 @@ public class ExampleConfig {
     @ConditionalOnBean(name = "curatorConfig")
     public CuratorInstance curatorInstance(CuratorConfig curatorConfig) throws Exception {
         return new CuratorInstanceImpl(curatorConfig);
+    }
+
+    @Bean
+    @ConditionalOnBean(name = "curatorInstance")
+    public CuratorFramework curatorFramework(CuratorInstance curatorInstance) {
+        return curatorInstance.getCurator();
     }
 }
