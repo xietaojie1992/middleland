@@ -219,6 +219,7 @@ public class JedisTests extends ExamplesApplicationTests {
         } finally {
             jedis.resetState();
             jedis.unwatch();
+            jedis.del("version", "key");
         }
     }
 
@@ -268,5 +269,29 @@ public class JedisTests extends ExamplesApplicationTests {
         pubJedis.publish(channelName, "test message:2");
         pubJedis.publish(channelName, "test message:3");
         Thread.sleep(1000);
+    }
+
+    @Test
+    public void expireTest() {
+        try {
+            jedis.set("key", "value");
+            jedis.expire("key", 5);// 设置超时时间
+            Thread.sleep(3000);
+            Assert.assertTrue(jedis.exists("key"));
+            Assert.assertTrue(jedis.ttl("key") > 0);// 查看超时时间
+
+            jedis.persist("key");// 取消超时
+            Assert.assertEquals(-1, jedis.ttl("key").intValue());
+
+            jedis.expire("key", 1);
+            Thread.sleep(2000);
+            Assert.assertEquals(-2, jedis.ttl("key").intValue());
+            Assert.assertFalse(jedis.exists("key"));
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            jedis.del("key");
+        }
     }
 }
