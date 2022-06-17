@@ -28,7 +28,7 @@
         <commons.collections4.version>4.4</commons.collections4.version>
         <lombok.version>1.18.10</lombok.version>
         <log4j.version>2.12.1</log4j.version>
-        <fastjson.version>1.2.62</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <curator.version>4.2.0</curator.version>
         <zookeeper.version>3.5.5</zookeeper.version>
         <rabbitmq.version>5.4.3</rabbitmq.version>
