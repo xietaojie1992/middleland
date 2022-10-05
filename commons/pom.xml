@@ -33,7 +33,7 @@
         <zookeeper.version>3.5.5</zookeeper.version>
         <rabbitmq.version>5.4.3</rabbitmq.version>
         <jedis.version>3.3.0</jedis.version>
-        <jackson.version>2.10.0.pr1</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
     </properties>
 
     <dependencyManagement>
